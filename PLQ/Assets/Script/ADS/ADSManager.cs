@@ -12,6 +12,7 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
     [SerializeField] private Button rewardButtonContinion;
     [SerializeField] private GameObject menuManager;
     private bool is_rewardRedy;
+    private bool isAlreadyWatched;
 
     [SerializeField] private bool isModel;
     [SerializeField] private bool isMineMenu;
@@ -38,6 +39,7 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
         }
         
         rewardButton.interactable = true;
+        isAlreadyWatched = false;
     }
 
     void InitializeReward()
@@ -52,13 +54,17 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
         {
             StartCoroutine(is_Initialize());
         }
-       // Debug.Log("Unity ads ini state : " + Advertisement.isInitialized);
     }
 
     IEnumerator is_Initialize()
     {
         yield return new WaitForSeconds(0.5f);
         InitializeReward();
+    }
+
+    public void ReStart()
+    {
+        isAlreadyWatched = false;
     }
 
 
@@ -75,7 +81,7 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
     public void ShowRewardVideoContinion()
     {
         isModel = false;
-        if (Advertisement.IsReady())
+        if (Advertisement.IsReady() && isAlreadyWatched == false )
         {
             Advertisement.Show(rewardedVideo);
         }
@@ -87,9 +93,9 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
     {
         isMineMenu = false;
         int random = Random.Range(0, 100);
-        if (random < 61)
-        {
-            ShowInterstitialVideo();
+        if (random < 61 && Advertisement.IsReady())
+        {       
+           ShowInterstitialVideo(); 
         }
         else
         {
@@ -102,9 +108,9 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
     {
         isMineMenu = true;
         int random = Random.Range(0, 100);
-        if (random < 61)
+        if (random < 61 && Advertisement.IsReady())
         {
-            ShowInterstitialVideo();
+           ShowInterstitialVideo();
         }
         else
         {
@@ -124,6 +130,8 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
             Debug.Log("Advertisement not ready!");
         }
     }
+
+
 
 
     // IUnityAdsListener ............................................................
@@ -146,6 +154,7 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
                 }
                 else
                 {
+                    isAlreadyWatched = true;
                     menuManager.GetComponent<MenuManager>().RewardContinion();
                 }
 
@@ -153,11 +162,11 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
             }
             else if (showResult == ShowResult.Skipped)
             {
-                // послать нахуй
+                
             }
             else if (showResult == ShowResult.Failed)
             {
-                // послать нахуй
+                
             }
         }
 
@@ -200,7 +209,6 @@ public class ADSManager : MonoBehaviour, IUnityAdsListener
 
     public void OnUnityAdsDidStart(string placementId)
     {
-        Debug.Log(placementId);
     }
 
     public void OnUnityAdsReady(string placementId)

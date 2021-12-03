@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        LoadBackGroundModel();
         StartBackGround();
         StartGenerator();
     }
@@ -63,7 +64,7 @@ public class GameManager : MonoBehaviour
 
 
 
-    // Back Ground
+    // Back Ground..................................
 
     void StartBackGround()
     {
@@ -104,7 +105,7 @@ public class GameManager : MonoBehaviour
         backGrounds.Clear();
     }
 
-    // Generator
+    // Generator......................................
 
     void StartGenerator()
     {
@@ -314,7 +315,7 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < createdObstacle.Count; i++)
         {
-            if (createdObstacle[i].transform.position.y < bottomBound - 10)
+            if (createdObstacle[i].transform.position.y < bottomBound - 15)
             {
                 Destroy(createdObstacle[i]);
                 createdObstacle.RemoveAt(i);
@@ -322,7 +323,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Game
+    // Game.............................................
 
     public void Restart()
     {
@@ -355,6 +356,7 @@ public class GameManager : MonoBehaviour
     public void Dead()
     {
         menuManager.GetComponent<MenuManager>().DeathMenu();
+        menuManager.GetComponent<MenuManager>().NewScore(score);
     }
 
 
@@ -371,8 +373,8 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(2);
         character.GetComponent<BoxCollider2D>().enabled = true;
     }
-
-    // UI
+    
+    // UI.................................................................
 
     public void LeftButton()
     {
@@ -384,6 +386,7 @@ public class GameManager : MonoBehaviour
         DestroyBackGround();
         backGround = backGroundsType[actualBackGround];
         StartBackGround();
+        SaveBackGroundModel();
     }
 
     public void RightButton()
@@ -396,11 +399,12 @@ public class GameManager : MonoBehaviour
         DestroyBackGround();
         backGround = backGroundsType[actualBackGround];
         StartBackGround();
+        SaveBackGroundModel();
     }
 
 
 
-    // Character Model
+    // Character Model..........................................
     public void ParametersShips(CharacterModel charModel)
     {
         description = charModel.Description;
@@ -410,5 +414,21 @@ public class GameManager : MonoBehaviour
         spriteModel.GetComponent<SpriteRenderer>().sprite = charModel.Icon;
     }
     
+
+    // Save & Load..................................
+    void SaveBackGroundModel()
+    {
+        PlayerPrefs.SetInt("BackGroundType", actualBackGround);
+    }
+
+
+    void LoadBackGroundModel()
+    {
+        if (PlayerPrefs.HasKey("BackGroundType"))
+        {
+            actualBackGround = PlayerPrefs.GetInt("BackGroundType");
+            backGround = backGroundsType[actualBackGround];
+        }
+    }
 
 }

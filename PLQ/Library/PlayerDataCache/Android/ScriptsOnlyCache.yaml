@@ -671,7 +671,7 @@ ScriptsOnlyBuild:
     className: CameraManager
   - hash:
       serializedVersion: 2
-      Hash: 1fb1a0ee5390a2f42dee0e4dc550d5be
+      Hash: c8b23900a5f691f480f88e39f6b0d3b7
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: TargetButton
@@ -755,11 +755,11 @@ ScriptsOnlyBuild:
     className: FabrikSolver2D
   - hash:
       serializedVersion: 2
-      Hash: 20136ff69486b615509dcd6d9ca6deec
+      Hash: 9462d027b956f325a8db98a1fabf6353
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: MenuManager
   platform: 13
   scenePathNames:
   - Assets/Scenes/SampleScene.unity
-  playerPath: "C:/Users/Lenovo/Desktop/\u0418\u0413\u0440\u044B/PLQ 0.3.2.apk"
+  playerPath: "C:/Users/Lenovo/Desktop/\u0418\u0413\u0440\u044B/PLQ 1.2.apk"

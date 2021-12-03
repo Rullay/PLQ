@@ -15,7 +15,5 @@ public class TargetButton : MonoBehaviour
         menuManager.GetComponent<MenuManager>().RemoveTarget();
         targetImage.SetActive(true);
         targetImage.transform.position = transform.position;
-    }
-
-   
+    }  
 }

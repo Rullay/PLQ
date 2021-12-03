@@ -57,4 +57,5 @@ public class CharacterModel : ScriptableObject
     {
         availability = true;
     }
+
 }

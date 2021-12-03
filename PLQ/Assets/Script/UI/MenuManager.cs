@@ -10,14 +10,23 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject deathMenuPanel;
     [SerializeField] private GameObject MenuPanel;
     [SerializeField] private GameObject gameManager;
+    [SerializeField] private GameObject scorePanel;
     [SerializeField] private GameObject check;
     [SerializeField] private GameObject shopMenu;
     [SerializeField] private GameObject rewardButton;
+    [SerializeField] private GameObject ADSManager;
     [SerializeField] private Text scoreText;
     [SerializeField] private GameObject tapToContinion;
     [SerializeField] private List<CharacterModel> Models;
     [SerializeField] private List<GameObject> buyButtons;
     [SerializeField] private GameObject targetImage;
+
+    //таблица рекордов .........................................
+    [SerializeField] private List<Text> scoreTexts;
+    [SerializeField] private List<int> scoreInts = new List<int>();
+    private bool isContinue;
+    private int scoreIndexCont;
+    private int ScoreCount;
 
     private CharacterModel actualTarget;
     private bool isRewardContinion;
@@ -26,9 +35,13 @@ public class MenuManager : MonoBehaviour
     void Start()
     {
         actualTarget = Models[0];
+        isContinue = false;
+        LoadScore();
+        loadSkinEquiped();
+        LoadSkins();
     }
 
-   
+
     void Update()
     {
         TapToContinoin();
@@ -45,6 +58,7 @@ public class MenuManager : MonoBehaviour
         gameManager.GetComponent<GameManager>().Restart();
         deathMenuPanel.SetActive(false);
         MenuPanel.SetActive(false);
+        ADSManager.GetComponent<ADSManager>().ReStart();
     }
 
     public void Menu()
@@ -54,18 +68,16 @@ public class MenuManager : MonoBehaviour
         gameManager.GetComponent<GameManager>().MineMenu();
     }
 
+    public void Record()
+    {
+        scorePanel.SetActive(true);
+    }
+
 
     // Death Menu
     public void DeathMenu()
     {
         deathMenuPanel.SetActive(true);
-    }
-
-
-    public void ContinionButton()
-    {
-       // gameManager.GetComponent<GameManager>().ContinionGame();
-       // deathMenuPanel.SetActive(false);
     }
 
     public void TapToContinoin()
@@ -84,6 +96,7 @@ public class MenuManager : MonoBehaviour
         deathMenuPanel.SetActive(false);
         tapToContinion.SetActive(true);
         isRewardContinion = true;
+        isContinue = true;
     }
 
 
@@ -97,6 +110,7 @@ public class MenuManager : MonoBehaviour
     public void BackToMineMenu()
     {
         shopMenu.SetActive(false);
+        scorePanel.SetActive(false);
     }
     public void Equiped(GameObject button)
     {
@@ -106,8 +120,9 @@ public class MenuManager : MonoBehaviour
             {
                 gameManager.GetComponent<GameManager>().ParametersShips(Models[i]);
                 check.transform.position = new Vector2(249, buyButtons[i].transform.position.y);
+                PlayerPrefs.SetInt("Skin", i);
             }
-        } 
+        }
     }
 
     public void RemoveTarget()
@@ -138,12 +153,148 @@ public class MenuManager : MonoBehaviour
     }
 
     public void UnlockingModel()
-    {   
+    {
         actualTarget.Unlocking();
         rewardButton.SetActive(false);
+        SaveSkins();
+    }
+
+    // Records Menu
+
+    public void NewScore(float fScore)
+    {
+        int score = (int)fScore;
+        if (isContinue == true)
+        {
+            scoreInts[scoreIndexCont] = score;
+            RecordText();
+            isContinue = false;
+        }
+        else
+        {
+            if (scoreInts.Count < scoreTexts.Count)
+            {
+                scoreInts.Add(score);
+                for (int i = 0; i < scoreInts.Count; i++)
+                {
+                    if (scoreInts[i] == score)
+                    {
+                        scoreIndexCont = i;
+                    }
+                }
+                RecordText();
+            }
+            else
+            {
+                int minScore = scoreInts[0];
+                int minIndex = 0;
+                for (int i = 0; i < scoreInts.Count; i++)
+                {
+                    if (scoreInts[i] < minScore)
+                    {
+                        minScore = scoreInts[i];
+                        minIndex = i;
+                    }
+                }
+
+                if (score > minScore)
+                {
+                    scoreInts[minIndex] = score;
+                    scoreIndexCont = minIndex;
+                    RecordText();
+                }
+
+            }
+        }
+        SaveScore();
+    }
+
+    void RecordText()
+    {
+        int minUsed = 1000000000;
+        for (int j = 0; j < scoreInts.Count; j++)
+        {
+            int maxScore = 0;
+            for (int i = 0; i < scoreInts.Count; i++)
+            {
+                if (scoreInts[i] > maxScore && scoreInts[i] < minUsed)
+                {
+                    maxScore = scoreInts[i];
+                }
+
+            }
+            minUsed = maxScore;
+            scoreTexts[j].text = "Score : " + maxScore;
+        }
+       
+
     }
 
 
+    // Save & Load..................................
+    void SaveScore()
+    {
+        for (int i = 0; i < scoreInts.Count; i++)
+        {
+            PlayerPrefs.SetInt("Score" + i, scoreInts[i]);
+        }
+        ScoreCount = scoreInts.Count;
+        PlayerPrefs.SetInt("ScoreCount", ScoreCount);
+    }
+    void LoadScore()
+    {
+        ScoreCount = PlayerPrefs.GetInt("ScoreCount");
+        if (PlayerPrefs.HasKey("Score0"))
+        {
+            for (int i = 0; i < ScoreCount; i++)
+            {
+                scoreInts.Add(PlayerPrefs.GetInt("Score" + i));
+            }           
+        }
+        RecordText();
+    }
 
+    void loadSkinEquiped()
+    {
+        if (PlayerPrefs.HasKey("Skin"))
+        {
+            shopMenu.SetActive(true);
+            Equiped(buyButtons[PlayerPrefs.GetInt("Skin")]);
+            shopMenu.SetActive(false); 
+        }
+        else
+        {
+            shopMenu.SetActive(true);
+            Equiped(buyButtons[0]);
+            shopMenu.SetActive(false);
+        }
+
+    }
+
+
+    void SaveSkins()
+    {
+        for (int i = 0; i < Models.Count; i++)
+        {
+            if (Models[i].Availability == true)
+            {
+                PlayerPrefs.SetInt("Unlock" + i, i);
+            }
+        }
+    }
+
+    void LoadSkins()
+    {
+        if (PlayerPrefs.HasKey("Unlock0"))
+        {
+            for (int i = 0; i < Models.Count; i++)
+            {
+                if(i == (PlayerPrefs.GetInt("Unlock" + i)))
+                {
+                    Models[i].Unlocking();
+                }
+            }
+        }
+    }
 
 }

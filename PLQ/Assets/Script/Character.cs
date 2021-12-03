@@ -43,10 +43,8 @@ public class Character : MonoBehaviour
             {
                 MausePosition = Input.mousePosition - _camera.WorldToScreenPoint(transform.position);
                 MausePosition_Vector = new Vector2(MausePosition.x * 5 / Screen.width, MausePosition.y * 5 / Screen.width);
-                Debug.Log(MausePosition_Vector);
                 angleOfRotation = Vector3.Angle(Vector3.up, MausePosition_Vector) * -MausePosition.x / Mathf.Abs(MausePosition.x);
                 _camera.GetComponent<CameraManager>().CameraSpeed(moveSpeed);
-                Debug.Log(angleOfRotation);
             }
             currentAngle = Mathf.Lerp(currentAngle, angleOfRotation, RotateSpeed * Time.deltaTime);
             currentAngle = Mathf.Clamp(currentAngle, -50, 50);
@@ -66,8 +64,10 @@ public class Character : MonoBehaviour
 
     public void MoveSpeed(float score)
     {
-        moveSpeed = actualMoveSpeed + (score / (1000 * moveSpeed));
-        
+        //moveSpeed = actualMoveSpeed + (score / (1000 * moveSpeed));
+        moveSpeed = (1 - Mathf.Pow(1 - 0.00003f, 8000 + score)) * 12;
+            
+
     }
 
     public void StartPosition()
